@@ -1,5 +1,9 @@
 <?php    
-    require_once 'parse_lib.php';
-        
+require_once 'parse_lib.php';
+
+while (true) {
     $data = load_and_parse();
-    echo "\n".$data."\n";
+    echo $data."\n";
+    `echo "$data">>~/data.csv`;
+    sleep(1);
+}

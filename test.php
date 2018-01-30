@@ -37,8 +37,9 @@
             while(!feof($file))
             {                
                 $arr = fgetcsv($file, 0, ";");
-                if (!$arr)
+                if (!$arr) {
                     continue;
+                }
                 
                 $data = map_data($arr);
                 print_row($data);

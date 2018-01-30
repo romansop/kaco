@@ -1,5 +1,25 @@
 <?php
 
+$solar = null;
+
+function sim_loadcsv() {
+    global $solar;
+    
+    if (!$solar) {
+        $solar = fopen("solar.csv","r");
+    }
+                
+    if (!feof($solar))
+    {                
+        $fields = fgetcsv($solar, 0, ";");        
+        return $fields;
+    } else {
+        fclose($solar);
+    }
+    
+    return null;
+}
+
 function loadcsv() {
     `wget "http://213.174.6.10:7777/realtime.csv" -O /tmp/realtime.csv -o /dev/null`;
     $file = fopen("/tmp/realtime.csv","r");
@@ -39,11 +59,16 @@ function parse($fields) {
     $rdc1=mround($rwdc1);
     $rdc2=mround($rwdc2);
     $rac=mround($cw);
+    
+    $today = mktime(0, 0, 0, date("m", $fields[0]),
+        date("d", $fields[0]), date("Y", $fields[0]));
+    $seconds = $fields[0] - $today;
 
-    return "$date;$rcv1;$rca1;$rcv2;$rca2;$rdc1;$rdc2;$rac";
+    return "$date;$rcv1;$rca1;$rcv2;$rca2;$rdc1;$rdc2;$rac;$seconds";
 }
 
 function load_and_parse() {
     $fields = loadcsv();
+    #$fields = sim_loadcsv();
     return parse($fields);
 }
