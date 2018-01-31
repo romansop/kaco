@@ -34,6 +34,11 @@
             $file = fopen("solar.csv","r");
             print_row(["Time","V DC I","A DC I", "W DC I", "V DC II",
                 "A DC II", "W DC II", "W AC"]);
+            
+            $watt = 0;
+            $count = 0;
+            $prev_h = -1;
+            $prev_ts = 0;
             while(!feof($file))
             {                
                 $arr = fgetcsv($file, 0, ";");
@@ -42,8 +47,28 @@
                 }
                 
                 $data = map_data($arr);
-                print_row($data);
-                break;
+                                
+                $ts = strtotime($arr[0]);
+                if (!$prev_ts) {
+                    $prev_ts = $ts;
+                    continue;
+                }
+                
+                $diff_ts = $ts - $prev_ts;
+                $prev_ts = $ts;
+                $hour = date("H", $ts);                
+                
+                if ($prev_h != $hour) {                    
+                    $data['time'] = $prev_h;
+                    $data['wac'] = $watt / 3600;                    
+                    $watt = 0;
+                    $prev_h = $hour;
+                    if ($data['wac']) {
+                        print_row($data);
+                    }
+                } else {
+                    $watt += $data['wac'] * $diff_ts;
+                }
             }            
             fclose($file);
         ?>
