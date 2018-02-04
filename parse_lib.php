@@ -6,7 +6,7 @@ function sim_loadcsv() {
     global $solar;
     
     if (!$solar) {
-        $solar = fopen("solar.csv","r");
+        $solar = fopen("/www/php/sim_input.csv","r");
     }
                 
     if (!feof($solar))
@@ -34,8 +34,166 @@ function loadcsv() {
     return $fields;
 }
 
-function mround($val) {
-    return $val;
+class CRoundRobin
+{
+    protected $stack;
+    protected $limit;
+    
+    public function __construct($limit = 60) {
+        // initialize the stack
+        $this->stack = array();
+        // stack can only contain this many items
+        $this->limit = $limit;
+    }
+
+    public function push($item) {
+        if (count($this->stack) >= $this->limit) {            
+            array_shift($this->stack);
+        }
+        
+        array_push($this->stack, $item);
+    }
+    
+    public function pushMany($item, $count) {
+        for ($i=0; $i<$count; $i++) {
+            $this->push($item);
+        }
+    }
+
+    public function top() {
+        return current($this->stack);
+    }
+
+    public function isEmpty() {
+        return empty($this->stack);
+    }
+    
+    public function getAvg() {
+        $sum = 0;
+        foreach ($this->stack as $item) {
+            $sum += $item;
+        }
+        return $sum / count($this->stack);
+    }
+    
+    public function getMin() {
+        $min = $this->stack[0];
+        foreach ($this->stack as $item) {
+            if ($item < $min) {
+                $min = $item;
+            }
+        }
+        return $min;
+    }
+    
+    public function getMax() {
+        $max = $this->stack[0];
+        foreach ($this->stack as $item) {
+            if ($item > $max) {
+                $max = $item;
+            }
+        }
+        return $max;
+    }
+}
+
+class CAggrData extends CData {
+    public $vdc1_min;
+    public $vdc1_max;
+    public $adc1_min;
+    public $adc1_max;
+    public $wdc1_min;
+    public $wdc1_max;
+    public $vdc2_min;
+    public $vdc2_max;
+    public $adc2_min;
+    public $adc2_max;
+    public $wdc2_min;
+    public $wdc2_max;
+    public $wac_min;
+    public $wac_max;
+    
+    private $_rbb = [];
+    
+    public function __construct() {
+        parent::__construct([0,0,0,0,0,0,0,0,0]);
+        
+        foreach (CAggrData::getAvgParams() as $param) {
+            $this->_rbb[$param] = new CRoundRobin();
+        }
+    }
+    
+    public function getParam($param) {
+        return $this->_rbb[$param];
+    }
+    
+    public function getMinVal($param) {
+        return $this->{$param."_min"};
+    }
+    
+    public function getMaxVal($param) {
+        return $this->{$param."_max"};
+    }
+    
+    public function setMinVal($param, $val) {
+        $this->{$param."_min"} = $val;
+    }
+    
+    public function setMaxVal($param, $val) {
+        $this->{$param."_max"} = $val;
+    }
+    
+    public static function getAvgParams() {
+        return ["vdc1","adc1","wdc1","vdc2","adc2","wdc2","wac"];
+    }
+    
+    public function resetAvgParams() {
+        $params = $this->getAvgParams();
+        foreach ($params as $param) {
+            $this->setVal($param, 0);
+            $this->setMinVal($param, 0);
+            $this->setMaxVal($param, 0);
+        }
+    }
+}
+
+class CData {
+    public $time;    
+    public $vdc1;
+    public $adc1;
+    public $wdc1;
+    public $vdc2;
+    public $adc2;
+    public $wdc2;
+    public $wac;
+    public $secs;
+    
+    private $_data_array;
+
+    public function __construct($data_array) {
+        $this->_data_array = $data_array;
+        $this->time = $data_array[0];
+        $this->vdc1 = $data_array[1];
+        $this->adc1 = $data_array[2];
+        $this->wdc1 = $data_array[3];
+        $this->vdc2 = $data_array[4];
+        $this->adc2 = $data_array[5];
+        $this->wdc2 = $data_array[6];
+        $this->wac = $data_array[7];
+        $this->secs = $data_array[8];        
+    }
+
+    public function getVal($param) {
+        return $this->{$param};
+    }
+    
+    public function setVal($param, $val) {
+        $this->{$param} = $val;
+    }
+    
+    public function getRawData() {
+        return $this->_data_array;
+    }
 }
 
 function parse($fields) {
@@ -52,24 +210,22 @@ function parse($fields) {
     $ca1=$va1 / (65535 / 200);   # Amper DC
     $cv2=$vv2 / (65535 / 1600);  # Volt DC
     $ca2=$va2 / (65535 / 200);   # Amper DC
-    $cw=$vw / (65535 / 100000);  # Watt AC
-
-    $rwdc1=$cv1 * $ca1;
-    $rwdc2=$cv2 * $ca2;
-
-    $rcv1=mround($cv1);
-    $rca1=mround($ca1);
-    $rcv2=mround($cv2);
-    $rca2=mround($ca2);
-    $rdc1=mround($rwdc1);
-    $rdc2=mround($rwdc2);
-    $rac=mround($cw);
-    
+    $wac=$vw / (65535 / 100000);  # Watt AC
+    $wdc1=$cv1 * $ca1;
+    $wdc2=$cv2 * $ca2;    
     $today = mktime(0, 0, 0, date("m", $fields[0]),
         date("d", $fields[0]), date("Y", $fields[0]));
     $seconds = $fields[0] - $today;
 
-    return "$date;$rcv1;$rca1;$rcv2;$rca2;$rdc1;$rdc2;$rac;$seconds";
+    return new CData([$date,$cv1,$ca1,$cv2,$ca2,$wdc1,$wdc2,$wac,$seconds]);
+}
+
+function get_csv($fields) {
+    $str = "";
+    foreach ($fields as $field) {        
+        $str .= $field . ";";
+    }
+    return substr($str, 0, -1);
 }
 
 function load_and_parse() {

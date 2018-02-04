@@ -1,4 +1,9 @@
-#!/bin/bash
+#!/bin/sh
+
+php-cli parse.php 
+#tail -f ~/data.csv
+#killall php-cli
+exit
 
 data=`cat realtime.csv`
 IFS=';' read -ra fields <<< "$data"
