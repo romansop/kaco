@@ -170,7 +170,6 @@ class CAggrData extends CData {
         foreach ($params as $param) {
             $str .= sprintf(";%F",$this->getVal($param.$suffix));
         }
-        $str .= ";$this->secs";
         return $str;
     }
 }
@@ -261,7 +260,7 @@ function handle_aggregation(CData $data, CAggrCtx $ctx, CAggrData $accum, $minut
     }
     $ctx->accum->updateParams();
     
-    $avg = $accum->printAggrData()."\n";
+    $avg = $accum->printAggrData();
     `echo "$avg" >> /tmp/yield.csv`;
 }
 
