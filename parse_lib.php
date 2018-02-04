@@ -28,15 +28,16 @@ function sim_loadcsv() {
 }
 
 function loadcsv() {
-    `wget "http://213.174.6.10:7777/realtime.csv" -O /tmp/realtime.csv -o /dev/null`;
+    $filename = '/tmp/realtime.csv';
+    `wget "http://213.174.6.10:7777/realtime.csv" -O $filename -o /dev/null`;
+    if (!file_exists($filename)) {
+        return null;
+    }
+    
     $file = fopen("/tmp/realtime.csv","r");
-    #$file = fopen("realtime.csv","r");    
     $fields = fgetcsv($file, 0, ";");
     fclose($file);
-    
-    #$str = file_get_contents('http://213.174.6.10:7777/realtime.csv');
-    #echo $str."\n";
-    #$fields = explode(";", $str);
+    unlink($filename);
     
     return $fields;
 }

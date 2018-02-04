@@ -18,7 +18,7 @@ function handle_interval(CData $data, CAggrCtx $ctx, CAggrData $accum, $minute) 
 }
 
 while (true) {
-    $fields = sim_loadcsv();
+    $fields = loadcsv();
     if (!$fields) {
         sleep(1);
         continue;
