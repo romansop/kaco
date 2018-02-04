@@ -1,9 +1,15 @@
 <?php
 
-$solar = null;
+class CAggrCtx {
+    public $prev_secs = -1;
+    public $prev_interval = -1;
+    public $seconds = 0;
+    public $accum = null;
+    public $orig = null;
+}
 
 function sim_loadcsv() {
-    global $solar;
+    static $solar = null;
     
     if (!$solar) {
         $solar = fopen("/www/php/sim_input.csv","r");
@@ -147,13 +153,25 @@ class CAggrData extends CData {
         return ["vdc1","adc1","wdc1","vdc2","adc2","wdc2","wac"];
     }
     
-    public function resetAvgParams() {
+    public function updateParams() {
         $params = $this->getAvgParams();
         foreach ($params as $param) {
-            $this->setVal($param, 0);
-            $this->setMinVal($param, 0);
-            $this->setMaxVal($param, 0);
+            /* @var $rbb CRoundRobin */
+            $rbb = $this->getParam($param);
+            $this->setVal($param, $rbb->getAvg());
+            $this->setMinVal($param, $rbb->getMin());
+            $this->setMaxVal($param, $rbb->getMax());
         }
+    }
+    
+    public function printAggrData($suffix = "") {
+        $str = "$this->time";
+        $params = $this->getAvgParams();
+        foreach ($params as $param) {
+            $str .= sprintf(";%F",$this->getVal($param.$suffix));
+        }
+        $str .= ";$this->secs";
+        return $str;
     }
 }
 
@@ -228,8 +246,59 @@ function get_csv($fields) {
     return substr($str, 0, -1);
 }
 
-function load_and_parse() {
-    $fields = loadcsv();
-    #$fields = sim_loadcsv();
-    return parse($fields);
+function avgParam(CData $data, CAggrCtx $ctx, CAggrData $accum, $diff_secs, $param, CRoundRobin $rbb) {
+    $rbb->pushMany($data->getVal($param), $diff_secs);
+    $accum->time = $data->time;
+    $accum->secs = $data->secs;
+    
+    return $rbb->getAvg();
+}
+
+function handle_aggregation(CData $data, CAggrCtx $ctx, CAggrData $accum, $minute, $diff_secs) {
+    foreach (CAggrData::getAvgParams() as $param) {
+        $rbb = $accum->getParam($param);
+        avgParam($data, $ctx, $accum, $diff_secs, $param, $rbb);
+    }
+    $ctx->accum->updateParams();
+    
+    $avg = $accum->printAggrData()."\n";
+    `echo "$avg" >> /tmp/yield.csv`;
+}
+
+function aggregate_minute_stats($data, $orig) {
+    static $ctx = null;    
+    if (!$ctx) {        
+        $ctx = new CAggrCtx();
+        $ctx->accum = new CAggrData();
+    }
+    
+    $ctx->orig = $orig;
+    $minute = floor($data->secs / 60);
+    
+    if ($ctx->prev_interval < 0) {
+        $ctx->prev_interval = $minute;
+        return;
+    }
+    
+    if ($ctx->prev_secs < 0) {
+        $ctx->prev_secs = $data->secs;
+        return;
+    }    
+    
+    $diff_secs = $data->secs - $ctx->prev_secs;
+    $ctx->prev_secs = $data->secs;
+    $ctx->seconds += $diff_secs;
+    if ($ctx->seconds > 60) {
+        $diff_secs -= $ctx->seconds - 60;
+        $ctx->seconds = 60;
+    }
+    
+    handle_aggregation($data, $ctx, $ctx->accum, $minute, $diff_secs);
+    
+    if ($ctx->prev_interval != $minute) {
+        handle_interval($data, $ctx, $ctx->accum, $minute);
+        $ctx->seconds = $data->secs % 60;        
+        handle_aggregation($data, $ctx, $ctx->accum, $minute, $ctx->seconds);        
+        $ctx->prev_interval = $minute;
+    }
 }
