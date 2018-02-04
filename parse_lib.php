@@ -21,6 +21,7 @@ function sim_loadcsv() {
         return $fields;
     } else {
         fclose($solar);
+        exit();
     }
     
     return null;
@@ -168,7 +169,7 @@ class CAggrData extends CData {
         $str = "$this->time";
         $params = $this->getAvgParams();
         foreach ($params as $param) {
-            $str .= sprintf(";%F",$this->getVal($param.$suffix));
+            $str .= sprintf(",%F",$this->getVal($param.$suffix));
         }
         return $str;
     }
