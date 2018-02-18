@@ -31,17 +31,17 @@
             
             //$res = `./parse.sh>/tmp/test.csv`;
             //$file = fopen("/tmp/test.csv","r");
-            $file = fopen("solar.csv","r");
+            $file = fopen("yields/2018-02-18.csv","r");
             print_row(["Time","V DC I","A DC I", "W DC I", "V DC II",
                 "A DC II", "W DC II", "W AC"]);
-            
+            $total = 0;
             $watt = 0;
             $count = 0;
             $prev_h = -1;
             $prev_ts = 0;
             while(!feof($file))
             {                
-                $arr = fgetcsv($file, 0, ";");
+                $arr = fgetcsv($file, 0, ",");
                 if (!$arr) {
                     continue;
                 }
@@ -65,6 +65,7 @@
                     $prev_h = $hour;
                     if ($data['wac']) {
                         print_row($data);
+                        $total += $data['wac'];
                     }
                 } else {
                     $watt += $data['wac'] * $diff_ts;
@@ -73,5 +74,9 @@
             fclose($file);
         ?>
         </table>
+        <?php
+        $total = round($total) / 1000;
+        echo "<br><div>Total: $total</div>";
+        ?>
     </body>
 </html>
