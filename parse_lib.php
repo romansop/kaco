@@ -29,7 +29,8 @@ function sim_loadcsv() {
 
 function loadcsv() {
     $filename = '/tmp/realtime.csv';
-    `wget "http://192.168.34.170:7777/realtime.csv" --bind-address=192.168.34.20 --timeout=5 -O $filename -o /dev/null`;
+    $address = '192.168.34.20';
+    `wget "http://192.168.34.170:7777/realtime.csv" --bind-address=$address --timeout=5 -O $filename -o /dev/null`;
     if (!file_exists($filename)) {
         return null;
     }
