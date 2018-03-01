@@ -27,6 +27,7 @@ while (true) {
     
     if ($data->vdc1 == 0 && $data->vdc2 == 0) {
         continue;
+        sleep(30);
     }
 
     aggregate_minute_stats($data, $fields);

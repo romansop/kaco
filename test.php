@@ -104,7 +104,11 @@
                         if (in_array($key, ["wac","wdc1","wdc2"])) {
                             $data[$key] = $avg[$key] / 60;
                         } else {
-                            $data[$key] = $avg[$key] / $count;
+			    if ($count != 0) {
+                            	$data[$key] = $avg[$key] / $count;
+			    } else {
+                            	$data[$key] = 0;
+			    }
                         }
                     }
                     if ($data['wac']) {
