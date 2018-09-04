@@ -1,0 +1,131 @@
+0  Initphase
+1  Waiting for feed-in
+2  Generator voltage too low
+3  Constant volt. control
+4  Feed-in mode
+7  Self test in progress
+8  Self test in progress
+9  Test mode
+10  Temperature in unit too high
+11  Power limitation
+17  Powador-protect disconnection
+18  Resid. current shutdown (AFI)
+19  Generator insulation fault
+20  Power rampup active
+21  Protect. shutdown overcurrent DC1
+22  Protect. shutdown overcurrent DC2
+23  Protect. shutdown overcurrent DC3
+29  Check ground fault fuse
+30  Voltage trans. fault
+31  RCD module error
+32  Self test error
+33  DC feed-in error
+34  Internal communication error
+35  Protect. shutdown SW
+36  Protect. shutdown HW
+37  Unknown Hardware
+38  Error: Generator Voltage too high
+41  Line failure: undervoltage L1
+42  Line failure: overvoltage L1
+43  Line failure: undervoltage L2
+44  Line failure: overvoltage L2
+45  Line failure: undervoltage L3
+46  Line failure: overvoltage L3
+47  Line failure: line-to-line voltage
+48  Line failure: underfreqency
+49  Line failure: overfrequency
+50  Line failure: average voltage
+51  Line failure: middle overvoltage L1
+52  Line failure: middle undervoltage L1
+53  Line failure: middle overvoltage L2
+54  Line failure: middle undervoltage L2
+55  DC link voltage error
+56  SPI Shutdown
+57  Waiting for reactivation
+58  Control board overtemperature
+59  Self test error
+60  Generator voltage too high
+61  External limit
+62  Standalone mode
+63  Power reduction P(f)
+64  Output current limiting
+65  ROCOF error
+67  Power section 1 error
+68  Power section 2 error
+69  Power section 3 error
+70  Fan 1 error
+71  Fan 2 error
+72  Fan 3 error
+73  Grid failure: Islanding
+74  External reactive power request
+75  Self test in progress
+78  Resid. current shutdown (AFI)
+79  Insulation measurement
+80  Insulation meas. not possible
+81  Protect. shutdown grid voltage L1
+82  Protect. shutdown grid voltage L2
+83  Protect. shutdown grid voltage L3
+84  Protect. shutdown overv. DC link
+85  Protect. shutdown underv. DC link
+86  Protect. shutdown unbal. DC link
+87  Protect. shutdown overcurrent L1
+88  Protect. shutdown overcurrent L2
+89  Protect. shutdown overcurrent L3
+90  Protect. shutdown voltage drop 5V
+91  Protect. shutdown voltage drop 2.5V
+92  Protect. shutdown voltage drop 1.5V
+93  Self test error buffer 1
+94  Self test error buffer 2
+95  Self test error relay 1
+96  Self test error relay 2
+97  Protect. shutdown HW overcurrent
+98  Protect. shutdown HW gate driver
+99  Protect. shutdown HW buffer-enable
+100  Protect. shutdown HW overtemperature
+101  Plausibility fault temperature
+102  Plausibility fault efficiency
+103  Plausibility fault DC link
+104  Plausibility fault RCD module
+105  Plausibility fault relay
+106  Plausibility fault DCDC converter
+108  Line failure: overvoltage L1
+109  Line failure: overvoltage L2
+110  Line failure: overvoltage L3
+111  Line failure: undervoltage L1
+112  Line failure: undervoltage L2
+113  Line failure: undervoltage L3
+114  Communication error DC/DC
+115  Negative DC current 1
+116  Negative DC current 2
+117  Negative DC current 3
+118  DC overvoltage 1
+119  DC overvoltage 2
+120  DC overvoltage 3
+121  Door opened
+125  Error relay control
+126  Error RCD measurement
+127  Error AC voltage measurement
+128  Error internal memory 1
+129  Power reduction P(U)
+130  Self-test error AFCI module
+131  Arc detected on DC1
+132  Arc detected on DC2
+133  Arc detected on DC3
+134  AFCI power supply critical
+135  Internal AFCI ADC failed
+136  AFCI algorithm failed
+137  Error internal memory 1
+138  AFCI parameters corrupted
+139  Error external memory 1
+140  Not enough AFCI DC inputs
+141  Error controller output pin
+142  AFCI activation failed
+148  Error external memory 1
+149  Communication error AFCI module
+150  Protect. shutdown voltage drop 1.65V
+151  Input current limitation DC1
+152  Input current limitation DC2
+153  Input current limitation DC3
+154  Input power limitation DC1
+155  Input power limitation DC2
+156  Input power limitation DC3

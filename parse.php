@@ -15,6 +15,7 @@ function handle_interval(CData $data, CAggrCtx $ctx, CAggrData $accum, $minute) 
     write_data($date."-max.csv", $max);
     
     `echo "$avg" > /tmp/yield.csv`;
+    `echo "$max" > /tmp/yield-max.csv`;
 }
 
 while (true) {
