@@ -351,14 +351,14 @@ function avgParam(CData $data, CAggrCtx $ctx, CAggrData $accum, $diff_secs, $par
 function append_log($filename, $str) {
     $my_file = $filename;
     $handle = fopen($my_file, 'a') or die('Cannot open file:  '.$my_file);
-    fwrite($handle, $str);
+    fwrite($handle, $str."\n");
     fclose($handle);
 }
 
 function write_log($filename, $str) {
     $my_file = $filename;
     $handle = fopen($my_file, 'w') or die('Cannot open file:  '.$my_file);
-    fwrite($handle, $str);
+    fwrite($handle, $str."\n");
     fclose($handle);
 }
 
