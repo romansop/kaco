@@ -348,6 +348,20 @@ function avgParam(CData $data, CAggrCtx $ctx, CAggrData $accum, $diff_secs, $par
     return $rbb->getAvg();
 }
 
+function append_log($filename, $str) {
+    $my_file = $filename;
+    $handle = fopen($my_file, 'a') or die('Cannot open file:  '.$my_file);
+    fwrite($handle, $str);
+    fclose($handle);
+}
+
+function write_log($filename, $str) {
+    $my_file = $filename;
+    $handle = fopen($my_file, 'w') or die('Cannot open file:  '.$my_file);
+    fwrite($handle, $str);
+    fclose($handle);
+}
+
 function handle_aggregation(CData $data, CAggrCtx $ctx, CAggrData $accum, $minute, $diff_secs) {
     foreach (CAggrData::getAvgParams() as $param) {
         $rbb = $accum->getParam($param);
@@ -356,7 +370,7 @@ function handle_aggregation(CData $data, CAggrCtx $ctx, CAggrData $accum, $minut
     $ctx->accum->updateParams();
     
     $avg = $accum->printAggrData();
-    `echo "$avg" >> /tmp/yield.csv`;
+    append_log("/tmp/yield.csv", $avg);
 }
 
 function aggregate_minute_stats($data, $orig) {
