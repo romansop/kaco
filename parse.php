@@ -5,6 +5,13 @@ function write_data($fn, $data) {
     `echo "$data" >> /www/php/yields/$fn`;
 }
 
+function write_log($filename, $str) {
+    $my_file = '/tmp/'.$filename;
+    $handle = fopen($my_file, 'w') or die('Cannot open file:  '.$my_file);
+    fwrite($handle, $str);
+    fclose($handle);
+}
+
 function handle_interval(CData $data, CAggrCtx $ctx, CAggrData $accum, $minute) {
     $avg = $accum->printAggrData();
     $max = $accum->printAggrData("_max");
@@ -14,8 +21,7 @@ function handle_interval(CData $data, CAggrCtx $ctx, CAggrData $accum, $minute) 
     write_data($date.".csv", $avg);
     write_data($date."-max.csv", $max);
     
-    `echo '$avg' > /tmp/yield.csv`;
-    `echo '$max' > /tmp/yield-max.csv`;
+    write_log("yield.csv", $avg);    
 }
 
 while (true) {
