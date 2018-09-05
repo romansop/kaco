@@ -107,6 +107,16 @@ class CRoundRobin
         }
         return $max;
     }
+
+    public function getErrors() {
+        $errors = "";
+	foreach ($this->stack as $item) {            
+            if (strpos($errors, $item.'|') === false) {
+                $errors .= $item.'|';
+	    }
+	}
+	return $errors;
+    }
 }
 
 class CAggrData extends CData {
@@ -156,7 +166,7 @@ class CAggrData extends CData {
     }
     
     public static function getAvgParams() {
-        return ["vdc1","adc1","wdc1","vdc2","adc2","wdc2","wac"];
+        return ["vdc1","adc1","wdc1","vdc2","adc2","wdc2","wac","status"];
     }
     
     public function updateParams() {
@@ -164,9 +174,15 @@ class CAggrData extends CData {
         foreach ($params as $param) {
             /* @var $rbb CRoundRobin */
             $rbb = $this->getParam($param);
-            $this->setVal($param, $rbb->getAvg());
-            $this->setMinVal($param, $rbb->getMin());
-            $this->setMaxVal($param, $rbb->getMax());
+	    if ($param == "status") {
+                $this->setVal($param, $rbb->getErrors());
+                //echo $rbb->getErrors()."\n";
+	    }
+	    else {
+                $this->setVal($param, $rbb->getAvg());
+                $this->setMinVal($param, $rbb->getMin());
+                $this->setMaxVal($param, $rbb->getMax());
+	    }
         }
     }
     
@@ -174,8 +190,15 @@ class CAggrData extends CData {
         $str = "$this->time";
         $params = $this->getAvgParams();
         foreach ($params as $param) {
-            $str .= sprintf(",%F",$this->getVal($param.$suffix));
+            if ($param == "status") {
+                $str .= ",".$this->getVal($param);
+            } else {
+                $str .= sprintf(",%F",$this->getVal($param.$suffix));
+            }
+            //echo $param." - ".$this->getVal($param.$suffix)."; ";
         }
+        //echo $this->getVal("status")."\n";
+        //echo $str."\n";
         return $str;
     }
 }
@@ -190,6 +213,7 @@ class CData {
     public $wdc2;
     public $wac;
     public $secs;
+    public $status;
     
     private $_data_array;
 
@@ -204,6 +228,7 @@ class CData {
         $this->wdc2 = $data_array[6];
         $this->wac = $data_array[7];
         $this->secs = $data_array[8];        
+        $this->status = $data_array[9];
     }
 
     public function getVal($param) {
@@ -239,8 +264,9 @@ function parse($fields) {
     $today = mktime(0, 0, 0, date("m", $fields[0]),
         date("d", $fields[0]), date("Y", $fields[0]));
     $seconds = $fields[0] - $today;
+    $status=$fields[$len-1];
 
-    return new CData([$date,$cv1,$ca1,$cv2,$ca2,$wdc1,$wdc2,$wac,$seconds]);
+    return new CData([$date,$cv1,$ca1,$cv2,$ca2,$wdc1,$wdc2,$wac,$seconds,$status]);
 }
 
 function get_csv($fields) {

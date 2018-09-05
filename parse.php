@@ -24,13 +24,14 @@ while (true) {
         sleep(1);
         continue;
     }
-    $data = parse($fields);
+    $data = parse($fields);    
     
     if ($data->vdc1 == 0 && $data->vdc2 == 0) {
+        sleep(1);
         continue;
-        sleep(30);
+//        sleep(30);
     }
-
+    
     aggregate_minute_stats($data, $fields);
     sleep(1);
 }
