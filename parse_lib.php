@@ -211,16 +211,19 @@ class CAggrData extends CData {
                 $str .= sprintf(",%F",$this->getVal($param.$suffix));
             }                        
         }
+        $str .= ",\n                   ";
         foreach ($params as $param) {
             if ($param != "status") {            
                 $str .= sprintf(",%F",$this->getMaxVal($param));
             }                        
         }
+        $str .= ",\n                   ";
         foreach ($params as $param) {
             if ($param != "status") {            
                 $str .= sprintf(",%F",$this->getMinVal($param));
             }                        
         }
+        $str .= ",\n";
         //echo $this->getVal("status")."\n";
         //echo $str."\n";
         return $str;
