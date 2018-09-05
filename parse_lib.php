@@ -134,6 +134,20 @@ class CAggrData extends CData {
     public $wdc2_max;
     public $wac_min;
     public $wac_max;
+    public $vac1_min;
+    public $vac1_max;
+    public $vac2_min;
+    public $vac2_max;
+    public $vac3_min;
+    public $vac3_max;
+    public $aac1_min;
+    public $aac1_max;
+    public $aac2_min;
+    public $aac2_max;
+    public $aac3_min;
+    public $aac3_max;
+    public $temperature_min;
+    public $temperature_max;
     
     private $_rbb = [];
     
@@ -166,7 +180,8 @@ class CAggrData extends CData {
     }
     
     public static function getAvgParams() {
-        return ["vdc1","adc1","wdc1","vdc2","adc2","wdc2","wac","status"];
+        return ["vdc1","adc1","wdc1","vdc2","adc2","wdc2","wac",
+            "vac1","vac2","vac3","aac1","aac2","aac3","temperature","status"];
     }
     
     public function updateParams() {
@@ -194,8 +209,17 @@ class CAggrData extends CData {
                 $str .= ",".$this->getVal($param);
             } else {
                 $str .= sprintf(",%F",$this->getVal($param.$suffix));
-            }
-            //echo $param." - ".$this->getVal($param.$suffix)."; ";
+            }                        
+        }
+        foreach ($params as $param) {
+            if ($param != "status") {            
+                $str .= sprintf(",%F",$this->getMaxVal($param));
+            }                        
+        }
+        foreach ($params as $param) {
+            if ($param != "status") {            
+                $str .= sprintf(",%F",$this->getMinVal($param));
+            }                        
         }
         //echo $this->getVal("status")."\n";
         //echo $str."\n";
@@ -214,6 +238,13 @@ class CData {
     public $wac;
     public $secs;
     public $status;
+    public $vac1;
+    public $vac2;
+    public $vac3;
+    public $aac1;
+    public $aac2;
+    public $aac3;
+    public $temperature;
     
     private $_data_array;
 
@@ -229,6 +260,13 @@ class CData {
         $this->wac = $data_array[7];
         $this->secs = $data_array[8];        
         $this->status = $data_array[9];
+        $this->vac1 = $data_array[10];
+        $this->vac2 = $data_array[11];
+        $this->vac3 = $data_array[12];
+        $this->aac1 = $data_array[13];
+        $this->aac2 = $data_array[14];
+        $this->aac3 = $data_array[15];
+        $this->temperature = $data_array[16];
     }
 
     public function getVal($param) {
@@ -245,6 +283,20 @@ class CData {
 }
 
 function parse($fields) {
+    //  0 - unixtime;
+    //  1 - DC1(V) * 65535 / 1600;
+    //  2 - DC2(V) * 65535 / 1600;
+    //  3 - AC1(V) * 65535 / 1600;
+    //  4 - AC2(V) * 65535 / 1600;
+    //  5 - AC3(V) * 65535 / 1600;
+    //  6 - DC1(A) * 65535 / 200;
+    //  7 - DC2(A) * 65535 / 200;
+    //  8 - AC1(A) * 65535 / 200;
+    //  9 - AC2(A) * 65535 / 200;
+    // 10 - AC3(A) * 65535 / 200;
+    // 11 - AC(W) * 65535 / 100000;
+    // 12 -  temperature*100;
+    // 13 - STATUS
     $dcCount=2;
     $acCount=3;
     $len=count($fields);
@@ -254,11 +306,20 @@ function parse($fields) {
     $vv2=$fields[2];
     $va2=$fields[2+$dcCount+$acCount];
     $vw=$fields[$len-3];
-    $cv1=$vv1 / (65535 / 1600);  # Volt DC
-    $ca1=$va1 / (65535 / 200);   # Amper DC
-    $cv2=$vv2 / (65535 / 1600);  # Volt DC
-    $ca2=$va2 / (65535 / 200);   # Amper DC
-    $wac=$vw / (65535 / 100000);  # Watt AC
+    $cv1=$vv1 / (65535 / 1600);  // Volt DC 1
+    $ca1=$va1 / (65535 / 200);   // Amper DC 1
+    $cv2=$vv2 / (65535 / 1600);  // Volt DC 2
+    $ca2=$va2 / (65535 / 200);   // Amper DC 2
+    $wac=$vw / (65535 / 100000); // Watt AC
+    //-------------------------------------
+    $ac1v=$fields[3] / (65535 / 1600);  // Volt AC 1
+    $ac2v=$fields[4] / (65535 / 1600);  // Volt AC 2
+    $ac3v=$fields[5] / (65535 / 1600);  // Volt AC 3
+    $ac1a=$fields[8] / (65535 / 200);   // Amper AC 1
+    $ac2a=$fields[9] / (65535 / 200);   // Amper AC 2
+    $ac3a=$fields[10] / (65535 / 200);  // Amper AC 3
+    $temperature=$fields[12] / 100;     // temperature celsius
+    ///////////////////////////////////////
     $wdc1=$cv1 * $ca1;
     $wdc2=$cv2 * $ca2;    
     $today = mktime(0, 0, 0, date("m", $fields[0]),
@@ -266,7 +327,7 @@ function parse($fields) {
     $seconds = $fields[0] - $today;
     $status=$fields[$len-1];
 
-    return new CData([$date,$cv1,$ca1,$cv2,$ca2,$wdc1,$wdc2,$wac,$seconds,$status]);
+    return new CData([$date,$cv1,$ca1,$cv2,$ca2,$wdc1,$wdc2,$wac,$seconds,$status,$ac1v,$ac2v,$ac3v,$ac1a,$ac2a,$ac3a,$temperature]);
 }
 
 function get_csv($fields) {
