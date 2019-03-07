@@ -21,11 +21,10 @@ while (true) {
     }
     $data = parse($fields);    
     
-    if ($data->vdc1 == 0 && $data->vdc2 == 0) {
-        sleep(1);
-        continue;
-//        sleep(30);
-    }
+//    if ($data->vdc1 == 0 && $data->vdc2 == 0) {
+//        sleep(1);
+//        continue;
+//    }
     
     aggregate_minute_stats($data, $fields);
     sleep(1);
