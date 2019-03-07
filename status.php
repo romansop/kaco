@@ -305,6 +305,9 @@
                                     $data[$key] = 0;
                                 }
                             }
+                            
+                            if ($key == "wac")
+                                break;
                         }
                         if ($data['wac']) {
                             //print_row($data);
