@@ -236,6 +236,7 @@
                 } else {
                     $last_handled = true;
                     $hour++;
+		    break;
                 }
                                 
                 if ($data['vdc1'] || $data['vdc2']) {

@@ -302,6 +302,9 @@ function parse($fields) {
     $dcCount=2;
     $acCount=3;
     $len=count($fields);
+
+    $script_tz = date_default_timezone_get();
+    date_default_timezone_set('UTC');
     $date=date("d-m-Y H:i:s", $fields[0]);
     $vv1=$fields[1];
     $va1=$fields[1+$dcCount+$acCount];
@@ -328,6 +331,7 @@ function parse($fields) {
         date("d", $fields[0]), date("Y", $fields[0]));
     $seconds = $fields[0] - $today;
     $status=$fields[$len-1];
+    date_default_timezone_set($script_tz);
 
     return new CData([$date,$cv1,$ca1,$cv2,$ca2,$wdc1,$wdc2,$wac,$seconds,$status,$ac1v,$ac2v,$ac3v,$ac1a,$ac2a,$ac3a,$temperature]);
 }
