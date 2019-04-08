@@ -87,10 +87,14 @@
                 $data['vac2']  = round((double)$arr[9]);
                 $data['vac3']  = round((double)$arr[10]);
                 $data['vac3']  = round((double)$arr[10]);
-                $data['space'] = "";
+                $data['space1'] = "";
                 $data['vmac1'] = round((double)$arr[24]);
                 $data['vmac2'] = round((double)$arr[25]);
                 $data['vmac3'] = round((double)$arr[26]);
+                $data['space2'] = "";
+                $data['vmin1'] = round((double)$arr[39]);
+                $data['vmin2'] = round((double)$arr[40]);
+                $data['vmin3'] = round((double)$arr[41]);
                 
                 return $data;
             }
@@ -178,7 +182,8 @@
                     }
                     
                     $bgcolor = "";
-                    if (in_array($key, ["vac1","vac2","vac3","vmac1","vmac2","vmac3"])) {
+                    if (in_array($key, ["vac1","vac2","vac3","vmac1","vmac2","vmac3",
+                        "vmin1","vmin2","vmin3"])) {
                         $voltage = round($value);
                         if ($voltage >= 255)
                             $bgcolor = ' bgcolor="#ff3300"';
@@ -216,7 +221,8 @@
             }
             $file = fopen($filename,"r");
             print_row(["Time","V DC I","A DC I", "W DC I", "V DC II",
-                "A DC II", "W DC II", "W AC", "Status", "V AC 1",  "V AC 2",  "V AC 3", "<--->",  "Vmax AC 1",  "Vmax AC 2",  "Vmax AC 3"]);
+                "A DC II", "W DC II", "W AC", "Status", "V AC 1",  "V AC 2",  "V AC 3", "<--->",
+                "Vmax AC 1",  "Vmax AC 2",  "Vmax AC 3", "<--->",  "Vmin AC 1",  "Vmin AC 2",  "Vmin AC 3"]);
 
             $total = 0;
             $last_handled = false;
@@ -254,7 +260,7 @@
                 //print_row(["Time","V DC I","A DC I", "W DC I", "V DC II",
                 //    "A DC II", "W DC II", "W AC"]);
                 
-                $avg = map_data([0,0,0,0,0,0,0,0]);
+                $avg = map_data([0,0,0,0,0,0,0,0,0,0,0,0]);
                 $count = 0;
                 $prev_h = 0;
                 $prev_ts = 0;
