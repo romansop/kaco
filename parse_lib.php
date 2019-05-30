@@ -180,7 +180,7 @@ class CAggrData extends CData {
     }
     
     public static function getAvgParams() {
-        return ["vdc1","adc1","wdc1","vdc2","adc2","wdc2","wac",
+        return ["vdc1","adc1","vdc2","adc2","wdc1","wdc2","wac",
             "vac1","vac2","vac3","aac1","aac2","aac3","temperature","status"];
     }
     
@@ -333,7 +333,7 @@ function parse($fields) {
     $status=$fields[$len-1];
     date_default_timezone_set($script_tz);
 
-    return new CData([$date,$cv1,$ca1,$cv2,$ca2,$wdc1,$wdc2,$wac,$seconds,$status,$ac1v,$ac2v,$ac3v,$ac1a,$ac2a,$ac3a,$temperature]);
+    return new CData([$date,$cv1,$ca1,$wdc1,$cv2,$ca2,$wdc2,$wac,$seconds,$status,$ac1v,$ac2v,$ac3v,$ac1a,$ac2a,$ac3a,$temperature]);
 }
 
 function get_csv($fields) {
